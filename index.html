@@ -2,8 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>life.after.death</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>life.after.death | Ruby & Will</title>
+
+  <meta name="description" content="life.after.death is a film and theatre studio by Ruby Etches & William Proudler. Home of Soft Control (2025), a poetic essay film exploring ideology, belief, and modern mythmaking." />
+  <meta name="author" content="Ruby Etches, William Proudler" />
+  <meta name="keywords" content="life.after.death, Ruby Etches, William Proudler, Soft Control film, experimental cinema UK, political theatre collective, poetic film 2025, essay film, avant-garde theatre, independent film studio, London film artists" />
+  <meta property="og:title" content="Life After Death | Ruby Etches & William Proudler" />
+  <meta property="og:description" content="A film and theatre studio. life.after.death explores cinema as subconscious ritual. Founders Ruby Etches and William Proudler present Soft Control (2025)." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.life-after-death.com" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Life After Death | Ruby Etches & William Proudler" />
+  <meta name="twitter:description" content="Experimental film and theatre studio exploring cinema, dreams and belief. Creators of the upcoming film Soft Control (2025)." />
+
   <style>
     html, body {
       margin: 0;
@@ -15,6 +27,27 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      cursor: crosshair;
+      overflow: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: radial-gradient(circle at center, rgba(255,255,255,0.015), transparent 70%);
+      backdrop-filter: blur(1px);
+      pointer-events: none;
+      z-index: 0;
+      animation: subtleWaves 30s infinite ease-in-out;
+    }
+
+    @keyframes subtleWaves {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.015); }
     }
 
     .container {
@@ -22,13 +55,66 @@
       padding: 3rem;
       max-width: 700px;
       opacity: 0;
-      animation: fadeIn 2s ease forwards;
+      animation: fadeIn 2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+      transition: transform 2s ease, opacity 2s ease;
+      z-index: 2;
+      position: relative;
+    }
+
+    .container.echo p,
+    .container.echo h1,
+    .container.echo .credits,
+    .container.echo .signature {
+      animation: dissolveToMatrix 5s forwards;
+    }
+
+    @keyframes dissolveToMatrix {
+      to {
+        opacity: 0;
+        transform: translateY(100px) scale(0.9);
+        filter: blur(2px);
+      }
+    }
+
+    .drifting-word {
+      position: absolute;
+      color: rgba(255, 43, 43, 0.12);
+      font-size: 1.1rem;
+      font-family: monospace;
+      animation: wordDrift 60s linear forwards;
+      pointer-events: none;
+      white-space: nowrap;
+      z-index: 1;
+      filter: blur(0.5px);
+    }
+
+    @keyframes wordDrift {
+      0% { opacity: 0; transform: translateY(0) translateX(0) rotate(0deg); }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateY(-150vh) translateX(50vw) rotate(360deg); opacity: 0; }
+    }
+
+    .echo-line {
+      position: absolute;
+      width: 100vw;
+      height: 1px;
+      background: rgba(255, 43, 43, 0.05);
+      animation: drift 20s infinite linear;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    @keyframes drift {
+      0% { transform: translateY(0) translateX(0); }
+      100% { transform: translateY(-200vh) translateX(10vw); }
     }
 
     h1 {
       font-size: 3rem;
       margin-bottom: 2.5rem;
       letter-spacing: 0.02em;
+      font-weight: bold;
     }
 
     p {
@@ -43,19 +129,113 @@
       font-style: italic;
     }
 
+    .signature {
+      font-family: monospace;
+      font-size: 0.75rem;
+      opacity: 0.3;
+      text-align: right;
+      color: #ff2b2b;
+      margin-top: 4rem;
+    }
+
+    footer {
+      position: absolute;
+      bottom: 1rem;
+      left: 1rem;
+      font-size: 0.85rem;
+      color: #333;
+      font-style: italic;
+      opacity: 0.5;
+      cursor: pointer;
+      z-index: 3;
+    }
+
     @keyframes fadeIn {
+      from { opacity: 0; }
       to { opacity: 1; }
     }
   </style>
 </head>
 <body>
-  <div class="container">
+  <div class="container" id="mainContainer">
     <h1>life.after.death</h1>
     <p>I’ve got a million ways of trying<br>to convince you something’s going on here.</p>
     <p>But it’s like the films<br>speak to us in our dreams.</p>
     <p>And theatre is thousands of years old.</p>
     <p>We are making film and theatre.</p>
     <div class="credits">Ruby + Will</div>
+    <div class="signature">[ MESH: 01–05 / STAGE: ORIGIN ]</div>
   </div>
+  <footer id="echoBtn">echo</footer>
+
+  <audio id="ambientSound" loop preload="auto">
+    <source src="soft_control_ambient.mp3" type="audio/mpeg" />
+  </audio>
+
+  <script>
+    const sound = document.getElementById('ambientSound');
+    const echo = document.getElementById('echoBtn');
+    const container = document.getElementById('mainContainer');
+    let playing = false;
+    let lines = [];
+    let driftInterval;
+
+    const wordPool = [
+      'life.after.death', 'subroutine', 'echo()', 'function()', '⧖', '🜏', '<meta>', 'filter:blur', '0x4D3', 'const', 'ritual', 'soft', 'theatre', 'projector',
+      'script', 'mesh', 'html', 'CSS', '</div>', '<body>', 'document.querySelector', 'layer', 'floating', 'ideology', 'truth', '0001', '93X', '{ code }',
+      'belief', 'formless', 'fadeIn()', '🝗', '⟠', 'stage', 'memory', 'return null', 'ghost', 'divergence', 'drift', 'awake', 'depth', 'loop',
+      'mirror', 'residue', 'cinema', 'transmit', 'myth', '000', 'input', '<echo>', '</html>', 'SIGIL', 'fracture', '<!DOCTYPE>', 'echo:off', 'reverberate', 'float', '⟳', 'λ'
+    ];
+
+    function spawnDriftingWord() {
+      const word = document.createElement('div');
+      word.className = 'drifting-word';
+      word.style.top = `${Math.random() * window.innerHeight}px`;
+      word.style.left = `${Math.random() * window.innerWidth}px`;
+      word.textContent = wordPool[Math.floor(Math.random() * wordPool.length)];
+      document.body.appendChild(word);
+
+      setTimeout(() => {
+        if (document.body.contains(word)) document.body.removeChild(word);
+      }, 45000);
+    }
+
+    echo.addEventListener('click', () => {
+      if (!playing) {
+        sound.volume = 0.3;
+        sound.play();
+        echo.textContent = 'echo: on';
+        container.classList.add('echo');
+
+        for (let i = 0; i < 20; i++) {
+          const line = document.createElement('div');
+          line.className = 'echo-line';
+          line.style.top = `${Math.random() * window.innerHeight}px`;
+          line.style.left = `${Math.random() * 100}vw`;
+          line.style.transform = `rotate(${Math.random() * 1 - 0.5}deg)`;
+          document.body.appendChild(line);
+          lines.push(line);
+        }
+
+        for (let i = 0; i < 150; i++) {
+          spawnDriftingWord();
+        }
+
+        driftInterval = setInterval(spawnDriftingWord, 150);
+
+      } else {
+        sound.pause();
+        echo.textContent = 'echo';
+        container.classList.remove('echo');
+
+        lines.forEach(line => document.body.removeChild(line));
+        lines = [];
+
+        document.querySelectorAll('.drifting-word').forEach(word => word.remove());
+        clearInterval(driftInterval);
+      }
+      playing = !playing;
+    });
+  </script>
 </body>
 </html>
