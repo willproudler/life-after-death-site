@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>life.after.death</title>
+  <title>life.after.death | Ruby & Will</title>
 
   <meta name="description" content="life.after.death is a film and theatre studio by Ruby Etches & William Proudler. Home of Soft Control (2025), a poetic essay film exploring ideology, belief, and modern mythmaking." />
   <meta name="author" content="Ruby Etches, William Proudler" />
@@ -78,7 +78,7 @@
 
     .drifting-word {
       position: absolute;
-      color: rgba(255, 43, 43, 0.12);
+      color: rgba(255, 43, 43, 0.6);
       font-size: 1.1rem;
       font-family: monospace;
       animation: wordDrift 60s linear forwards;
@@ -86,6 +86,26 @@
       white-space: nowrap;
       z-index: 1;
       filter: blur(0.5px);
+      transition: opacity 4s ease-out, transform 4s ease-out;
+    }
+
+    .hint-word {
+      position: absolute;
+      font-family: monospace;
+      font-size: 0.95rem;
+      color: rgba(255, 43, 43, 0.06);
+      pointer-events: none;
+      white-space: nowrap;
+      z-index: 1;
+      animation: hintDrift 20s linear forwards;
+      filter: blur(0.4px);
+    }
+
+    @keyframes hintDrift {
+      0% { opacity: 0; transform: translateY(0); }
+      10% { opacity: 0.4; }
+      90% { opacity: 0.4; }
+      100% { transform: translateY(-50vh); opacity: 0; }
     }
 
     @keyframes wordDrift {
@@ -97,7 +117,7 @@
 
     .echo-line {
       position: absolute;
-      width: 100vw;
+      width: 10vw;
       height: 1px;
       background: rgba(255, 43, 43, 0.05);
       animation: drift 20s infinite linear;
@@ -140,15 +160,32 @@
 
     footer {
       position: absolute;
-      bottom: 1rem;
-      left: 1rem;
-      font-size: 0.85rem;
+      bottom: 1.55rem;
+      left: 1.55rem;
+      font-size: 1.15rem;
       color: #333;
       font-style: italic;
       opacity: 0.5;
       cursor: pointer;
       z-index: 3;
     }
+    
+    #echoBtn {
+  animation: echoPulse 3s infinite ease-in-out;
+  color: rgba(255, 43, 43, 0.5);
+  text-shadow: 0 0 6px rgba(255, 43, 43, 0.4);
+}
+
+@keyframes echoPulse {
+  0%, 100% {
+    color: rgba(255, 43, 43, 0.4);
+    text-shadow: 0 0 4px rgba(255, 43, 43, 0.2);
+  }
+  50% {
+    color: rgba(255, 43, 43, 0.9);
+    text-shadow: 0 0 10px rgba(255, 43, 43, 0.7);
+  }
+}
 
     @keyframes fadeIn {
       from { opacity: 0; }
@@ -178,30 +215,110 @@
     const container = document.getElementById('mainContainer');
     let playing = false;
     let lines = [];
-    let driftInterval;
+    let driftTimeout;
+    let hintInterval;
 
-    const wordPool = [
-      'life.after.death', 'subroutine', 'echo()', 'function()', '⧖', '🜏', '<meta>', 'filter:blur', '0x4D3', 'const', 'ritual', 'soft', 'theatre', 'projector',
-      'script', 'mesh', 'html', 'CSS', '</div>', '<body>', 'document.querySelector', 'layer', 'floating', 'ideology', 'truth', '0001', '93X', '{ code }',
-      'belief', 'formless', 'fadeIn()', '🝗', '⟠', 'stage', 'memory', 'return null', 'ghost', 'divergence', 'drift', 'awake', 'depth', 'loop',
-      'mirror', 'residue', 'cinema', 'transmit', 'myth', '000', 'input', '<echo>', '</html>', 'SIGIL', 'fracture', '<!DOCTYPE>', 'echo:off', 'reverberate', 'float', '⟳', 'λ'
-    ];
+  const wordPool = [
+  // Core identity and creators
+  'life.after.death', 'Ruby', 'William', 'Ruby', 'Will',
+
+  // Visible content
+  'I’ve', 'got', 'a', 'million', 'ways', 'of', 'trying', 'to', 'convince', 'you',
+  'something’s', 'going', 'on', 'here', 'But', 'it’s', 'like', 'the', 'films', 'speak',
+  'to', 'us', 'in', 'our', 'dreams', 'And', 'theatre', 'is', 'thousands', 'of', 'years',
+  'old', 'We', 'are', 'making', 'film', 'and', 'theatre',
+
+  // Meta description / keywords / tags
+  'film', 'theatre', 'studio', 'Soft Control', '2025', 'poetic', 'essay', 'exploring',
+  'ideology', 'belief', 'modern', 'mythmaking', 'experimental', 'cinema', 'UK', 'political',
+  'collective', 'avant-garde', 'independent', 'London', 'artists', 'ritual', 'subconscious',
+  'dreams', 'cinema', 'subroutine',
+
+  // HTML elements and attributes
+  '<!DOCTYPE>', '<html>', '</html>', '<head>', '<meta>', '<title>', '<body>', '<div>',
+  '</div>', '<h1>', '<p>', '<audio>', '<source>', '<footer>', '<script>',
+
+  // CSS class names & animations
+  'container', 'fadeIn', 'dissolveToMatrix', 'drifting-word', 'echo-line', 'echoBtn',
+  'subtleWaves', 'echo', 'signature', 'credits', 'Times New Roman', 'monospace',
+  'crosshair', 'backdrop-filter', 'radial-gradient', 'translateY', 'translateX', 'rotate',
+  'blur', 'scale', 'opacity', 'animation', 'z-index',
+
+  // JavaScript-specific
+  'echo()', 'function()', 'const', 'let', 'return null', 'document.getElementById',
+  'querySelector', 'setInterval', 'clearInterval', 'Math.random()', 'forEach', 'textContent',
+  'appendChild', 'removeChild', 'driftInterval', 'spawnDriftingWord', 'driftingWords',
+  'push', 'filter', 'play', 'pause', 'playing', 'true', 'false',
+
+  // Numbers and symbols
+  '⧖', '🜏', '🝗', '⟠', '⟳', 'λ', '0', '1', '000', '0001', '2025', '93X', '0x4D3', '60s',
+  '150vh', '200vh', '50vw', '100vh', '30s', '20s', '5s',
+
+  // Thematic additions
+  'echo', 'myth', 'truth', 'ghost', 'fracture', 'formless', 'memory', 'divergence', 'drift',
+  'awake', 'depth', 'loop', 'mirror', 'residue', 'cinema', 'transmit', 'SIGIL', 'reverberate',
+  'float', 'layer', 'projector', 'soft', 'mesh', 'stage', 'origin', 'ritual', 'filter:blur',
+  'code', 'belief', 'structure', 'script', 'dream', 'control', 'system', 'interface',
+  'unknown', 'vision', 'screen', 'shadow', 'resonance', 'pulse', 'artifact', 'threshold',
+  'syntax', 'lens', 'memory', 'trace', 'invisible', 'signal', 'presence', 'fade', 'break',
+  'align', 'descent', 'remnant', 'output', 'scanline', 'echo:off', 'presence', 'interface',
+  'cinematic', 'unreal', 'loopback'
+];
 
     function spawnDriftingWord() {
       const word = document.createElement('div');
       word.className = 'drifting-word';
-      word.style.top = `${Math.random() * window.innerHeight}px`;
-      word.style.left = `${Math.random() * window.innerWidth}px`;
+      word.style.top = `${-50 + Math.random() * (window.innerHeight + 100)}px`;
+      word.style.left = `${-100 + Math.random() * (window.innerWidth + 200)}px`;
       word.textContent = wordPool[Math.floor(Math.random() * wordPool.length)];
       document.body.appendChild(word);
+    }
 
+    function spawnHintWord() {
+      if (playing) return;
+      const word = document.createElement('div');
+      word.className = 'hint-word';
+      word.textContent = wordPool[Math.floor(Math.random() * wordPool.length)];
+      const echoRect = echo.getBoundingClientRect();
+      word.style.left = `${echoRect.left + 10}px`;
+      word.style.top = `${echoRect.top - 10}px`;
+      document.body.appendChild(word);
+    }
+
+ window.addEventListener('load', () => {
+  hintInterval = setInterval(() => {
+    const word = document.createElement('div');
+    word.className = 'drifting-word';
+    word.textContent = wordPool[Math.floor(Math.random() * wordPool.length)];
+
+    const echoRect = echo.getBoundingClientRect();
+    word.style.left = `${echoRect.left + Math.random() * 30 - 15}px`;
+    word.style.top = `${echoRect.top}px`;
+    word.style.opacity = '0';
+    word.style.transform = 'translateY(0)';
+
+    document.body.appendChild(word);
+
+    requestAnimationFrame(() => {
+      word.style.transition = 'opacity 8s ease-out, transform 20s ease-in';
+      word.style.opacity = '0.7';
+      word.style.transform = 'translateY(-60vh)';
+    });
+
+    setTimeout(() => {
+      word.style.opacity = '0';
       setTimeout(() => {
         if (document.body.contains(word)) document.body.removeChild(word);
-      }, 45000);
-    }
+      }, 10000000);
+    }, 14); // word is visible for 14s, fades for 6s
+  }, 2800);
+});
 
     echo.addEventListener('click', () => {
       if (!playing) {
+        clearInterval(hintInterval);
+        document.querySelectorAll('.hint-word').forEach(word => word.remove());
+
         sound.volume = 0.3;
         sound.play();
         echo.textContent = 'echo: on';
@@ -217,11 +334,26 @@
           lines.push(line);
         }
 
-        for (let i = 0; i < 150; i++) {
+        // Staggered initial burst
+        let initialCount = 0;
+        const staggeredInitial = setInterval(() => {
+          if (initialCount >= 60) {
+            clearInterval(staggeredInitial);
+            return;
+          }
           spawnDriftingWord();
-        }
+          initialCount++;
+        }, 120);
 
-        driftInterval = setInterval(spawnDriftingWord, 150);
+        // Variable-rate drift loop
+        let driftRate = 120;
+        const maxRate = 220;
+        function driftLoop() {
+          spawnDriftingWord();
+          driftRate = Math.min(maxRate, driftRate + 1);
+          driftTimeout = setTimeout(driftLoop, driftRate);
+        }
+        driftLoop();
 
       } else {
         sound.pause();
@@ -232,7 +364,7 @@
         lines = [];
 
         document.querySelectorAll('.drifting-word').forEach(word => word.remove());
-        clearInterval(driftInterval);
+        clearTimeout(driftTimeout);
       }
       playing = !playing;
     });
